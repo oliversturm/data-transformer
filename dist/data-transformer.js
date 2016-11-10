@@ -57,24 +57,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+			value: true
 	});
 
-	function transformArrayOfArrays(source) {
-	  for (var _len = arguments.length, names = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    names[_key - 1] = arguments[_key];
-	  }
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	  var defaultName = function defaultName(i) {
-	    return "field" + i;
-	  };
-	  return source.map(function (a) {
-	    return a.reduce(function (r, v, i) {
-	      r[i < names.length ? names[i] : defaultName(i)] = v;
-	      return r;
-	    }, {});
-	  });
+	function transformArrayOfArrays(source) {
+			var fieldNames = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+			var fieldPrefix = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "field";
+
+			var defaultName = function defaultName(a, ai, v, vi) {
+					var prefix = fieldPrefix;
+					var skipNumbering = false;
+					if (typeof fieldPrefix === "function") {
+							var r = fieldPrefix(a, ai, v, vi);
+							if ((typeof r === "undefined" ? "undefined" : _typeof(r)) === "object") {
+									prefix = r.prefix;
+									if (r.skipNumbering) {
+											skipNumbering = r.skipNumbering;
+									}
+							} else {
+									prefix = r;
+							}
+					}
+					return prefix + (skipNumbering ? "" : vi);
+			};
+
+			return source.map(function (a, ai) {
+					return a.reduce(function (r, v, vi) {
+							r[vi < fieldNames.length ? fieldNames[vi] : defaultName(a, ai, v, vi)] = v;
+							return r;
+					}, {});
+			});
 	}
+
+	function transformData(data) {
+			return data.map(function (p) {
+					return p.values.map(function (v) {
+							return {
+									place: p.place, month: v.month, degreesC: v.degreesC
+							};
+					});
+			}).reduce(function (r, v) {
+					return r.concat(v);
+			});
+	}
+
+	function flattenOneToN(data) {
+			var nFields = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+			return data.map(function (d) {});
+	}
+
+	var people = [{ name: "Oli",
+			phones: [{ country: "UK", number: "879879" }, { country: "US", number: "13123" }],
+			addresses: [{ city: "London", postCode: "AB34 7EF" }, { city: "Los Angeles", postCode: "98743" }]
+	}];
 
 	exports.transformArrayOfArrays = transformArrayOfArrays;
 
