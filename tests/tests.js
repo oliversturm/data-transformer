@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { transformArrayOfArrays } from "../data-transformer.js";
+import { transformArrayOfArrays } from "../dist/data-transformer.js";
 
 describe("#transformArrayOfArrays", function() {
     it("should return correct value for simple transformation", function() {

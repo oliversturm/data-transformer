@@ -1,32 +1,34 @@
 {
-  "name": "data-transformer.js",
-  "version": "0.0.1",
-  "description": "Transformation helpers for JavaScript data structures",
-  "main": "data-transformers.js",
-  "scripts": {
-    "test": "mocha --compilers js:babel-core/register tests/tests.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/oliversturm/data-transformer.git"
-  },
-  "keywords": [
-    "util"
-  ],
-  "author": "Oliver Sturm <oliver@oliversturm.com>",
-  "license": "SEE LICENSE IN LICENSE",
-  "bugs": {
-    "url": "https://github.com/oliversturm/data-transformer/issues"
-  },
-  "homepage": "https://github.com/oliversturm/data-transformer#readme",
-  "devDependencies": {
-    "babel-cli": "6.18.0",
-    "babel-core": "6.18.2",
-    "babel-preset-es2015": "6.18.0",
-    "chai": "3.5.0",
-    "mocha": "3.1.2",
-    "webpack": "1.13.3",
-    "webpack-uglify-js-plugin": "1.1.9"
-  },
-  "dependencies": {}
+    "name": "data-transformer.js",
+    "version": "0.0.1",
+    "description": "Transformation helpers for JavaScript data structures",
+    "main": "data-transformers.js",
+    "scripts": {
+	"test": "npm run build && mocha --compilers js:babel-core/register tests/tests.js",
+	"build": "webpack"
+    },
+    "repository": {
+	"type": "git",
+	"url": "git+https://github.com/oliversturm/data-transformer.git"
+    },
+    "keywords": [
+	"util"
+    ],
+    "author": "Oliver Sturm <oliver@oliversturm.com>",
+    "license": "SEE LICENSE IN LICENSE",
+    "bugs": {
+	"url": "https://github.com/oliversturm/data-transformer/issues"
+    },
+    "homepage": "https://github.com/oliversturm/data-transformer#readme",
+    "devDependencies": {
+	"babel-cli": "6.18.0",
+	"babel-core": "6.18.2",
+	"babel-loader": "6.2.7",
+	"babel-preset-es2015": "6.18.0",
+	"chai": "3.5.0",
+	"mocha": "3.1.2",
+	"webpack": "1.13.3",
+	"webpack-uglify-js-plugin": "1.1.9"
+    },
+    "dependencies": {}
 }
