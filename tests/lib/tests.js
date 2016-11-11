@@ -118,4 +118,37 @@ describe("#transformArrayOfArrays", function () {
 			});
 });
 
-// empty data edge case
+describe("#flattenOneToN", function () {
+			it("should work with basic 1-N", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }] }]))).to.eql([{ country: 'UK', city: 'London', population: 10000000 }, { country: 'UK', city: 'Edinburgh', population: 800000 }]);
+			});
+			it("should work with basic 1-N, multiple master fields", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									dialcode: "44",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }] }]))).to.eql([{ country: 'UK', dialcode: "44", city: 'London', population: 10000000 }, { country: 'UK', dialcode: "44", city: 'Edinburgh', population: 800000 }]);
+			});
+			it("should work with basic 1-N, multiple masters", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }] }, { country: "USA",
+									cities: [{ city: "New York", population: 12000000 }] }]))).to.eql([{ country: 'UK', city: 'London', population: 10000000 }, { country: 'UK', city: 'Edinburgh', population: 800000 }, { country: 'USA', city: 'New York', population: 12000000 }]);
+			});
+			it("should work with 2N", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }],
+									counties: [{ county: "Kent" }, { county: "Buckinghamshire" }, { county: "Warwickshire" }, { county: "Yorkshire" }]
+						}]))).to.eql([{ "city": "London", "country": "UK", "county": "Kent", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Buckinghamshire", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Warwickshire", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Yorkshire", "population": 10000000 }, { "city": "Edinburgh", "country": "UK", "county": "Kent", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Buckinghamshire", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Warwickshire", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Yorkshire", "population": 800000 }]);
+			});
+			it("should work with 2N, two explicit n-fields", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }],
+									counties: [{ county: "Kent" }, { county: "Buckinghamshire" }, { county: "Warwickshire" }, { county: "Yorkshire" }]
+						}], ["cities", "counties"]))).to.eql([{ "city": "London", "country": "UK", "county": "Kent", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Buckinghamshire", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Warwickshire", "population": 10000000 }, { "city": "London", "country": "UK", "county": "Yorkshire", "population": 10000000 }, { "city": "Edinburgh", "country": "UK", "county": "Kent", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Buckinghamshire", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Warwickshire", "population": 800000 }, { "city": "Edinburgh", "country": "UK", "county": "Yorkshire", "population": 800000 }]);
+			});
+			it("should work with 2N, one explicit n-field", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }],
+									counties: [{ county: "Kent" }, { county: "Buckinghamshire" }]
+						}], ["cities"]))).to.eql([{ "city": "London", "country": "UK", "population": 10000000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }, { "city": "Edinburgh", "country": "UK", "population": 800000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }]);
+			});
+});

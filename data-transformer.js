@@ -57,61 +57,83 @@ function* transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field")
     }, source);
 }
 
-function flattenOneToN(data, nFields = [], detectNfields = true) {
+function* flattenOneToN(data, nFields = [], detectNfields = true) {
     function* findNfields(o) {
 	for (let field in o) {
-	    if (typeof o[field][Symbol.iterator] === "function"){
+	    if (typeof o[field] != "string" && typeof o[field][Symbol.iterator] === "function"){
 		yield field;
 	    }
 	}
     }
+
+    let actualNfields = Array.from((() => {
+	if (nFields.length == 0 && detectNfields) {
+	    const { value: firstValue, done } = data[Symbol.iterator]().next();
+	    if (!done) {
+		return (typeof detectNfields === "function") ?
+		    detectNfields(firstValue) : findNfields(firstValue);
+	    }
+	}
+
+	return nFields;	    
+    })());
+
+    function copyFields(source, target, exclusions=[]) {
+	for (let f in source) {
+	    if (! exclusions.includes(f)) {
+		target[f] = source[f];
+	    }
+	}
+	return target;
+    }
+
+    function cloneObject(source) {
+	return copyFields(source, {});
+    }
     
-    let actualNfields = (() => {
-	if (nFields === [] && detectNfields && data.length > 0) {
-	    return (typeof detectNfields === "function") ?
-		detectNfields(data) : findNfields(data[0]);
+    for (let d of data) {
+	let o = copyFields(d, {}, actualNfields);
+	
+	function* recurse(fieldIndex, o) {
+	    if (actualNfields.length - fieldIndex < 1) {
+		return;
+	    }
+	    
+	    const myList = d[actualNfields[fieldIndex]];
+	    if (myList.length > 0) {
+		const originalO = cloneObject(o);
+		
+		for (let value of d[actualNfields[fieldIndex]]) {
+		    let iterationO = cloneObject(originalO);
+		    copyFields(value, iterationO);
+		    
+		    yield* recurse(fieldIndex + 1, iterationO);
+		    if (fieldIndex === actualNfields.length - 1){
+			yield iterationO;
+		    }
+		}
+	    }
+	    else {
+		yield* recurse(fieldIndex + 1, o);
+		if (fieldIndex === actualNfields.length - 1){
+		    yield o;
+		}
+	    }
+	}
+
+	if (actualNfields.length > 0){
+	    yield* recurse(0, o);
 	}
 	else {
-	    return nFields;	    
+	    yield o;
 	}
-    })();
-    
-    
-}
-
-/*
-// Not in use yet
-function transformData(data) {
-  return data.map(p => 
-    p.values.map(v => ({
-      place: p.place, month: v.month, degreesC: v.degreesC
-    }))).reduce((r, v) => r.concat(v));
-}
-
-function flattenOneToN(data, nFields = []) {
-    return data.map(d =>
-		    {});
-    
-		   }
-
-var people = [
-    { name: "Oli",
-      phones: [
-	  { country: "UK", number: "879879" },
-	  { country: "US", number: "13123" }
-      ],
-      addresses: [
-	  { city: "London", postCode: "AB34 7EF" },
-	  { city: "Los Angeles", postCode: "98743" }
-      ]
     }
-];
-
-*/
+}
 
 export {
     transformArrayOfArrays,
     map,
-    fold
+    fold,
+    flattenOneToN
 };
 
