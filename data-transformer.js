@@ -1,5 +1,36 @@
 
-function transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field") {
+function* map(iterator, source) {
+    let index = 0;
+
+    for (let v of source) {
+	yield iterator(v, index++);	
+    }
+}
+
+// Hm... if Babel ever gets working tail call optimization, this might be nice.
+// function foldRecursive(reducer, initialValue, source) {
+//     const iterator = source[Symbol.iterator]();
+//     function fold_(r, v, xs, i) {
+// 	const x = xs.next();
+// 	return x.done ?
+// 	    v : fold_(r, r(v, x.value, i), xs, i + 1);
+//     }
+//     return fold_(reducer, initialValue, iterator, 0);    
+// }
+
+function fold(reducer, initialValue, source) { 
+    let r = initialValue;
+    let i = 0;
+    
+    for (let x of source){
+	r = reducer(r, x, i++);
+    }
+
+    return r;
+}
+
+
+function* transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field") {
     const defaultName = (a, ai, v, vi) => {
 	let prefix = fieldPrefix;
 	let skipNumbering = false;
@@ -18,12 +49,34 @@ function transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field") 
 	return prefix + (skipNumbering ? "" : vi);
     };
     
-    return source.map((a, ai) => {
-	return a.reduce((r, v, vi) => {
+    yield* map((a, ai) => {
+	return fold((r, v, vi) => {
 	    r[vi < fieldNames.length ? fieldNames[vi] : defaultName(a, ai, v, vi)] = v;
 	    return r;
-	}, {});
-    });
+	}, {}, a);
+    }, source);
+}
+
+function flattenOneToN(data, nFields = [], detectNfields = true) {
+    function* findNfields(o) {
+	for (let field in o) {
+	    if (typeof o[field][Symbol.iterator] === "function"){
+		yield field;
+	    }
+	}
+    }
+    
+    let actualNfields = (() => {
+	if (nFields === [] && detectNfields && data.length > 0) {
+	    return (typeof detectNfields === "function") ?
+		detectNfields(data) : findNfields(data[0]);
+	}
+	else {
+	    return nFields;	    
+	}
+    })();
+    
+    
 }
 
 /*
@@ -57,6 +110,8 @@ var people = [
 */
 
 export {
-    transformArrayOfArrays
+    transformArrayOfArrays,
+    map,
+    fold
 };
 

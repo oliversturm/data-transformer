@@ -1,5 +1,5 @@
 module.exports = {
-    entry: "./data-transformer.js",
+    entry: ["babel-polyfill", "./data-transformer.js"],
     output: {
 	filename: "./dist/data-transformer.js",
 	libraryTarget: "umd"
@@ -11,7 +11,7 @@ module.exports = {
 		exclude: /node_modules/,
 		loader: "babel",
 		query: {
-		    presets: ["es2015"]
+		    presets: ["es2015", "stage-0"]
 		}
 	    }
 	]
