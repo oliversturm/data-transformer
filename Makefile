@@ -10,11 +10,16 @@ TESTLIB = $(TESTSRC:tests/%.js=tests/lib/%.js)
 
 all: $(DIST)
 
+docs: README.md
+
 test: $(DIST) $(TESTLIB)
 	mocha $(TESTLIB)
 
 debugtest: $(DIST) $(TESTLIB)
 	mocha --debug-brk $(TESTLIB)
+
+README.md: README.template.md $(SRC)
+	jsdoc2md -t README.template.md $(SRC) > README.md
 
 tests/lib/%.js: tests/%.js .babelrc
 	mkdir -p $(@D)

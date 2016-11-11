@@ -1,5 +1,14 @@
+/**
+ * A module of data transformation helpers.
+ * @module data-transformer
+ */
 
-function* map(iterator, source) {
+/**
+ * map is a generator function that accepts an iterable **source** parameter and an **iterator** function. It iterates the source and applies the iterator to each element, yielding the results.
+ * @param {function} iterator - The iterator function to apply to each element of **source**
+ * @param {iterable} source - The source iterable that will be iterated
+ */
+export function* map(iterator, source) {
     let index = 0;
 
     for (let v of source) {
@@ -18,7 +27,7 @@ function* map(iterator, source) {
 //     return fold_(reducer, initialValue, iterator, 0);    
 // }
 
-function fold(reducer, initialValue, source) { 
+export function fold(reducer, initialValue, source) { 
     let r = initialValue;
     let i = 0;
     
@@ -29,8 +38,10 @@ function fold(reducer, initialValue, source) {
     return r;
 }
 
-
-function* transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field") {
+/**
+ * This is the transformArrayOfArrays function
+ */
+export function* transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field") {
     const defaultName = (a, ai, v, vi) => {
 	let prefix = fieldPrefix;
 	let skipNumbering = false;
@@ -57,7 +68,7 @@ function* transformArrayOfArrays(source, fieldNames = [], fieldPrefix = "field")
     }, source);
 }
 
-function* flattenOneToN(data, nFields = [], detectNfields = true) {
+export function* flattenOneToN(data, nFields = [], detectNfields = true) {
     function* findNfields(o) {
 	for (let field in o) {
 	    if (typeof o[field] != "string" && typeof o[field][Symbol.iterator] === "function"){
@@ -130,10 +141,10 @@ function* flattenOneToN(data, nFields = [], detectNfields = true) {
     }
 }
 
-export {
+/*export {
     transformArrayOfArrays,
     map,
     fold,
     flattenOneToN
-};
+};*/
 
