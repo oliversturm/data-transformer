@@ -190,9 +190,11 @@ Array.from(flattenOneToN([
 ]
 ```
 
-By default, the auto-detection of n-fields is performed once, using the first element of the top-level sequence. If the sequence contains objects with varying n-fields, you can run auto-detection for each object separately:
+By default, the auto-detection of n-fields is performed once, using the first element of the top-level sequence. If the sequence contains objects with varying n-fields, you can run auto-detection for each object separately.
 
-```
+**Note:** This example also shows the handling of sub-sequences that use primitive types. These are projected to the result set using the sub-sequence name as a field name.
+
+```javascript
 Array.from(flattenOneToN([
   {
     order: "12345",
