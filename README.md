@@ -136,7 +136,11 @@ Array.from(iterableOfIterablesToObjects(outerIterable()))
 
 ### flattenOneToN
 
-Assuming a structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
+In a 1-N data structure, the top-level sequence is assumed to contain objects which have one or more properties that refer to sub-sequences. We call these fields "n-fields". They can either be auto-detected or specified manually.
+
+#### Auto-detection
+
+Assuming a 1-N structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
 
 ```
 const data = [
@@ -186,6 +190,71 @@ Array.from(flattenOneToN([
 ]
 ```
 
+By default, the auto-detection of n-fields is performed once, using the first element of the top-level sequence. If the sequence contains objects with varying n-fields, you can run auto-detection for each object separately:
+
+```
+Array.from(flattenOneToN([
+  {
+    order: "12345",
+    productIds: [7, 8, 9]
+  },
+  {
+    order: "87463",
+    remoteRefs: ["one", "two", "three"]
+  }
+], undefined, {
+  perSourceObject: true
+}))
+
+[
+  { order: '12345', productIds: 7 },
+  { order: '12345', productIds: 8 },
+  { order: '12345', productIds: 9 },
+  { order: '87463', remoteRefs: 'one' },
+  { order: '87463', remoteRefs: 'two' },
+  { order: '87463', remoteRefs: 'three' } 
+]
+```
+
+It is possible to override the standard auto-detection mechanism by passing a function. This works for both per-object detection (in the following sample) or one-time detection.
+
+```
+Array.from(flattenOneToN([
+  {
+    type: "order",
+    orderId: "987987",
+    productIds: [7, 8]
+  },
+  {
+    type: "delivery",
+    deliveryId: "432141",
+    deliveryRefs: ["one", "two"]
+  }], undefined, {
+    perSourceObject: true,
+    dynamicDetector: o => {
+      if (o.type === "order") {
+        return ["productIds"];			
+      }
+      else if (o.type === "delivery") {
+        return ["deliveryRefs"];
+      }
+      else {
+        return [];
+      }
+    }
+  }))
+  
+[
+  { type: "order", orderId: '987987', productIds: 7 },
+  { type: "order", orderId: '987987', productIds: 8 },
+  { type: "delivery", deliveryId: '432141', deliveryRefs: "one" },
+  { type: "delivery", deliveryId: '432141', deliveryRefs: "two" } 
+]
+```
+
+
+#### Manual n-fields
+
 Instead of relying on the automatic detection of n-fields, you can pass in their names explicitly. If there are fields that would automatically be recognized as n-fields but are excluded explicitly, they will become part of the result objects without flattening:
 
 ```
@@ -212,9 +281,6 @@ Array.from(flattenOneToN([
 ]
 ```
 
-**MISSING: delegate for n-field detection**
-
-
 # API Reference
 
 <a name="module_data-transformer"></a>
@@ -227,7 +293,7 @@ A module of data transformation helpers.
     * [.map(iterator, source)](#module_data-transformer.map) ⇒ <code>iterable</code>
     * [.fold(reducer, initialValue, source)](#module_data-transformer.fold) ⇒ <code>value</code>
     * [.iterableOfIterablesToObjects(source, fieldNames, fieldPrefix)](#module_data-transformer.iterableOfIterablesToObjects) ⇒ <code>iterable</code>
-    * [.flattenOneToN(source, nFields, detectNfields)](#module_data-transformer.flattenOneToN) ⇒ <code>iterable</code>
+    * [.flattenOneToN(source, nFields, nFieldHandling)](#module_data-transformer.flattenOneToN) ⇒ <code>iterable</code>
 
 <a name="module_data-transformer.map"></a>
 
@@ -273,8 +339,8 @@ iterableOfIterablesToObjects is a generator function that accepts a **source** p
 
 <a name="module_data-transformer.flattenOneToN"></a>
 
-### data-transformer.flattenOneToN(source, nFields, detectNfields) ⇒ <code>iterable</code>
-flattenOneToN is a generator function that accepts a **source** parameter, which is expected to be an iterable yielding objects that include other iterables in their fields. These fields are called n-fields and a list of such n-fields can be passed in the **nFields** parameter. If no n-fields are passed and the **detectNfields** parameter is `true`, n-fields will be auto-detected in the first object yielded by the **source** sequence. **detectNfields** can also be a function, in which case it will be called to return a list of n-fields on the basis of the first **source** object. flattenOneToN returns a sequence of objects composed of all fields from the **source objects**, plus the fields from any iterable fields declared or detected as n-fields.
+### data-transformer.flattenOneToN(source, nFields, nFieldHandling) ⇒ <code>iterable</code>
+flattenOneToN is a generator function that accepts a **source** parameter, which is expected to be an iterable yielding objects that include other iterables in their fields. These fields are called n-fields and a list of such n-fields can be passed in the **nFields** parameter. If no n-field names are passed, n-fields will be auto-detected. **flattenOneToN** returns a sequence of objects composed of all fields from the **source** objects, plus the fields from objects referred to by iterable n-fields.
 
 **Kind**: static method of <code>[data-transformer](#module_data-transformer)</code>  
 **Returns**: <code>iterable</code> - An iterable sequence of result objects. These objects contain all fields found in the **source** sequence objects with the exception of those declared as n-fields. In addition, the objects contain all fields from the sub-iterable objects of the n-fields. If there is more than one n-field, the sequence contains objects reflecting all permutations of the n-field sub-iterable combinations.  
@@ -282,6 +348,6 @@ flattenOneToN is a generator function that accepts a **source** parameter, which
 | Param | Type | Description |
 | --- | --- | --- |
 | source | <code>iterable</code> | The source iterable, the "one" part of a 1-to-N data structure |
-| nFields | <code>array</code> | fields of the **source** objects that should be projected to the result set. Default values is `[]`. |
-| detectNfields | <code>bool</code> &#124; <code>function</code> | If this is a `bool`, the value is `true` and **nFields** is empty, n-fields will be auto-detected. If this is a function (and **nFields** is empty), the function is called with a single parameter, the first object from the **source** sequence, and it is expected to return a list of n-fields. |
+| nFields | <code>array</code> | fields of the **source** objects that should be projected to the result set. Default values is `[]`. N-fields are auto-detected if none are provided for this parameter. |
+| nFieldHandling | <code>object</code> | Defines how n-field detection works. Default value is `{ perSourceObject: false, dynamicDetector: undefined }`, and auto-detection happens by analyzing the first object yielded by the **source** sequence. **dynamicDetector** can be set to a function that handles n-field detection instead of the built-in algorithm, and if **perSourceObject** is true, detection will be performed for each object instead of once for the sequence (this works both with the built-in detection algorithm and with a custom one). |
 

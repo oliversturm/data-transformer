@@ -136,6 +136,10 @@ Array.from(iterableOfIterablesToObjects(outerIterable()))
 
 ### flattenOneToN
 
+In a 1-N data structure, the top-level sequence is assumed to contain objects which have one or more properties that refer to sub-sequences. We call these fields "n-fields". They can either be auto-detected or specified manually.
+
+#### Auto-detection
+
 Assuming a 1-N structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
 
 ```
@@ -186,6 +190,71 @@ Array.from(flattenOneToN([
 ]
 ```
 
+By default, the auto-detection of n-fields is performed once, using the first element of the top-level sequence. If the sequence contains objects with varying n-fields, you can run auto-detection for each object separately:
+
+```
+Array.from(flattenOneToN([
+  {
+    order: "12345",
+    productIds: [7, 8, 9]
+  },
+  {
+    order: "87463",
+    remoteRefs: ["one", "two", "three"]
+  }
+], undefined, {
+  perSourceObject: true
+}))
+
+[
+  { order: '12345', productIds: 7 },
+  { order: '12345', productIds: 8 },
+  { order: '12345', productIds: 9 },
+  { order: '87463', remoteRefs: 'one' },
+  { order: '87463', remoteRefs: 'two' },
+  { order: '87463', remoteRefs: 'three' } 
+]
+```
+
+It is possible to override the standard auto-detection mechanism by passing a function. This works for both per-object detection (in the following sample) or one-time detection.
+
+```
+Array.from(flattenOneToN([
+  {
+    type: "order",
+    orderId: "987987",
+    productIds: [7, 8]
+  },
+  {
+    type: "delivery",
+    deliveryId: "432141",
+    deliveryRefs: ["one", "two"]
+  }], undefined, {
+    perSourceObject: true,
+    dynamicDetector: o => {
+      if (o.type === "order") {
+        return ["productIds"];			
+      }
+      else if (o.type === "delivery") {
+        return ["deliveryRefs"];
+      }
+      else {
+        return [];
+      }
+    }
+  }))
+  
+[
+  { type: "order", orderId: '987987', productIds: 7 },
+  { type: "order", orderId: '987987', productIds: 8 },
+  { type: "delivery", deliveryId: '432141', deliveryRefs: "one" },
+  { type: "delivery", deliveryId: '432141', deliveryRefs: "two" } 
+]
+```
+
+
+#### Manual n-fields
+
 Instead of relying on the automatic detection of n-fields, you can pass in their names explicitly. If there are fields that would automatically be recognized as n-fields but are excluded explicitly, they will become part of the result objects without flattening:
 
 ```
@@ -211,8 +280,6 @@ Array.from(flattenOneToN([
   ] }
 ]
 ```
-
-Finally, if you need to dynamically detect n-fields, you can pass a function to **flattenOneToN** for the **detectNfields** parameter.
 
 # API Reference
 
