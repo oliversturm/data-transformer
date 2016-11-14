@@ -38,6 +38,11 @@ describe("#map", function () {
 									}, _callee, this);
 						})()))).to.eql([1, 4]);
 			});
+			it("should handle strings, which are iterables", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.map)(function (x) {
+									return x + x;
+						}, "hello"))).to.eql(["hh", "ee", "ll", "ll", "oo"]);
+			});
 });
 
 describe("#fold", function () {
@@ -115,8 +120,8 @@ describe("#iterableOfIterablesToObjects", function () {
 			});
 			it("should skip field numbering if told", function () {
 						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, undefined, function (a, ai, v, vi) {
-									return { prefix: "xxx" + vi * 2, skipNumbering: true };
-						}))).to.eql([{ xxx0: 1, xxx2: 2 }, { xxx0: "one", xxx2: "two" }]);
+									return { prefix: "i" + ai + "-f" + (vi + 1), skipNumbering: true };
+						}))).to.eql([{ "i0-f1": 1, "i0-f2": 2 }, { "i1-f1": "one", "i1-f2": "two" }]);
 			});
 
 			function innerIterable(x) {
@@ -201,5 +206,13 @@ describe("#flattenOneToN", function () {
 									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }],
 									counties: [{ county: "Kent" }, { county: "Buckinghamshire" }]
 						}], ["cities"]))).to.eql([{ "city": "London", "country": "UK", "population": 10000000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }, { "city": "Edinburgh", "country": "UK", "population": 800000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }]);
+			});
+			it("should work with function returning n-field name(s)", function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.flattenOneToN)([{ country: "UK",
+									cities: [{ city: "London", population: 10000000 }, { city: "Edinburgh", population: 800000 }],
+									counties: [{ county: "Kent" }, { county: "Buckinghamshire" }]
+						}], undefined, function () {
+									return ["cities"];
+						}))).to.eql([{ "city": "London", "country": "UK", "population": 10000000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }, { "city": "Edinburgh", "country": "UK", "population": 800000, counties: [{ county: "Kent" }, { county: "Buckinghamshire" }] }]);
 			});
 });

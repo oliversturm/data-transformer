@@ -1,7 +1,7 @@
 {
   "name": "data-transformer.js",
   "version": "0.0.1",
-  "description": "Transformation helpers for JavaScript data structures",
+  "description": "Transformation helpers for JavaScript iterables",
   "main": "data-transformers.js",
   "scripts": {
     "test": "make test",

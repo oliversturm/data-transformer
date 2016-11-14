@@ -85,7 +85,14 @@ export function* iterableOfIterablesToObjects(source, fieldNames = [], fieldPref
     }, source);
 }
 
-export function* flattenOneToN(data, nFields = [], detectNfields = true) {
+/** 
+ * flattenOneToN is a generator function that accepts a **source** parameter, which is expected to be an iterable yielding objects that include other iterables in their fields. These fields are called n-fields and a list of such n-fields can be passed in the **nFields** parameter. If no n-fields are passed and the **detectNfields** parameter is `true`, n-fields will be auto-detected in the first object yielded by the **source** sequence. **detectNfields** can also be a function, in which case it will be called to return a list of n-fields on the basis of the first **source** object. flattenOneToN returns a sequence of objects composed of all fields from the **source objects**, plus the fields from any iterable fields declared or detected as n-fields.
+ * @param {iterable} source - The source iterable, the "one" part of a 1-to-N data structure
+ * @param {array} nFields - fields of the **source** objects that should be projected to the result set. Default values is `[]`.
+ * @param {bool | function} detectNfields - If this is a `bool`, the value is `true` and **nFields** is empty, n-fields will be auto-detected. If this is a function (and **nFields** is empty), the function is called with a single parameter, the first object from the **source** sequence, and it is expected to return a list of n-fields.
+ * @return {iterable} An iterable sequence of result objects. These objects contain all fields found in the **source** sequence objects with the exception of those declared as n-fields. In addition, the objects contain all fields from the sub-iterable objects of the n-fields. If there is more than one n-field, the sequence contains objects reflecting all permutations of the n-field sub-iterable combinations.
+ */
+export function* flattenOneToN(source, nFields = [], detectNfields = true) {
     function* findNfields(o) {
 	for (let field in o) {
 	    if (typeof o[field] != "string" && typeof o[field][Symbol.iterator] === "function"){
@@ -96,7 +103,7 @@ export function* flattenOneToN(data, nFields = [], detectNfields = true) {
 
     let actualNfields = Array.from((() => {
 	if (nFields.length == 0 && detectNfields) {
-	    const { value: firstValue, done } = data[Symbol.iterator]().next();
+	    const { value: firstValue, done } = source[Symbol.iterator]().next();
 	    if (!done) {
 		return (typeof detectNfields === "function") ?
 		    detectNfields(firstValue) : findNfields(firstValue);
@@ -119,7 +126,7 @@ export function* flattenOneToN(data, nFields = [], detectNfields = true) {
 	return copyFields(source, {});
     }
     
-    for (let d of data) {
+    for (let d of source) {
 	let o = copyFields(d, {}, actualNfields);
 	
 	function* recurse(fieldIndex, o) {

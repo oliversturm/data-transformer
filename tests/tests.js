@@ -24,7 +24,14 @@ describe("#map", function() {
 	    })()
 	))).to.
 	    eql([1, 4]);
-    });    
+    });
+    it("should handle strings, which are iterables", function() {
+	expect(Array.from(map(x=> x + x, "hello"))).to.eql(
+	    ["hh", "ee", "ll", "ll", "oo"]
+	);
+	
+    });
+    
 });
 
 describe("#fold", function() {
@@ -79,8 +86,8 @@ describe("#iterableOfIterablesToObjects", function() {
 	    eql([ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]);
     });
     it("should skip field numbering if told", function() {
-	expect(Array.from(iterableOfIterablesToObjects(source, undefined, (a, ai, v, vi) => ({ prefix: "xxx" + vi * 2, skipNumbering: true })))).to.
-	    eql([ { xxx0: 1, xxx2: 2 }, { xxx0: "one", xxx2: "two" } ]);
+	expect(Array.from(iterableOfIterablesToObjects(source, undefined, (a, ai, v, vi) => ({ prefix: "i" + ai + "-f" + (vi + 1), skipNumbering: true })))).to.
+	    eql([ { "i0-f1": 1, "i0-f2": 2 }, { "i1-f1": "one", "i1-f2": "two" } ]);
     });
 
     function* innerIterable(x) {
@@ -219,6 +226,32 @@ describe("#flattenOneToN", function() {
 		} 
 	    ],
 	    ["cities"]
+	))).to.eql([
+            { "city": "London", "country": "UK",  "population": 10000000, counties: [
+		{ county: "Kent" },
+		{ county: "Buckinghamshire" }
+	    ] },
+            { "city": "Edinburgh", "country": "UK", "population": 800000, counties: [
+		{ county: "Kent" },
+		{ county: "Buckinghamshire" }
+	    ] }
+	]);
+    });
+    it("should work with function returning n-field name(s)", function() {
+	expect(Array.from(flattenOneToN(
+	    [
+		{ country: "UK",
+		  cities: [
+		      { city: "London", population: 10000000 },
+		      { city: "Edinburgh", population: 800000 } ],
+		  counties: [
+		      { county: "Kent" },
+		      { county: "Buckinghamshire" }
+		  ]
+		} 
+	    ],
+	    undefined,
+	    () => ["cities"]
 	))).to.eql([
             { "city": "London", "country": "UK",  "population": 10000000, counties: [
 		{ county: "Kent" },
