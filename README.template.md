@@ -17,7 +17,7 @@
 
 Call map like this:
 
-```
+```javascript
 Array.from(map(x => x * 2, [1, 2]))
 
 [2, 4]
@@ -25,7 +25,7 @@ Array.from(map(x => x * 2, [1, 2]))
 
 You can obtain the index of the element in the source sequence:
 
-```
+```javascript
 Array.from(map((x, index) => x * i, [1, 2]))
 
 [0, 2]
@@ -33,7 +33,7 @@ Array.from(map((x, index) => x * i, [1, 2]))
 
 Since map works with iterables, your input data doesn't have to be an array:
 
-```
+```javascript
 Array.from(map(x => x * x, (function*() => yield 3)()))
 
 [9]
@@ -41,7 +41,7 @@ Array.from(map(x => x * x, (function*() => yield 3)()))
 
 Any iterable data type is supported:
 
-```
+```javascript
 Array.from(map(x=> x + x, "hello"))
 
 ["hh", "ee", "ll", "ll", "oo"]
@@ -51,7 +51,7 @@ Array.from(map(x=> x + x, "hello"))
 
 **fold** aggregates values in a sequence using a reducer function and a starting value. It assumes an iterable as a source sequence, the behavior is unsurprising.
 
-```
+```javascript
 fold((r, v) => r + v, 0, [1, 2, 3])
 
 6
@@ -59,7 +59,7 @@ fold((r, v) => r + v, 0, [1, 2, 3])
 
 Indices can be obtained using a third parameter on the reducer:
 
-```
+```javascript
 fold((r, v, i) => r + v * i, 0, [1, 2, 3])
 
 8
@@ -69,13 +69,13 @@ fold((r, v, i) => r + v * i, 0, [1, 2, 3])
 
 Assuming this source array of arrays:
 
-```
+```javascript
 const source = [[1, 2], ["one", "two"]];
 ```
 
 You can pass in the names for fields expected in the result objects:
 
-```
+```javascript
 Array.from(iterableOfIterablesToObjects(source, ["one", "two"]))
 
 [ { one: 1, two: 2 }, { one: "one", two: "two" } ]
@@ -83,7 +83,7 @@ Array.from(iterableOfIterablesToObjects(source, ["one", "two"]))
 
 If you don't pass in enough field names, they are generated automatically:
 
-```
+```javascript
 Array.from(iterableOfIterablesToObjects(source))
 
 [ { field0: 1, field1: 2 }, { field0: "one", field1: "two" } ]
@@ -95,7 +95,7 @@ Array.from(iterableOfIterablesToObjects(source, ["one"]))
 
 To use a different field prefix instead of the standard "field", pass it as a third parameter:
 
-```
+```javascript
 Array.from(iterableOfIterablesToObjects(source, [], "xxx"))
 
 [ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]
@@ -103,7 +103,7 @@ Array.from(iterableOfIterablesToObjects(source, [], "xxx"))
 
 Alternatively, pass a function that generates a field prefix, or generates a full field name and skips automatic field numbering:
 
-```
+```javascript
 Array.from(iterableOfIterablesToObjects(source, [], () => "xxx"))
 
 [ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]
@@ -116,7 +116,7 @@ Array.from(iterableOfIterablesToObjects(source, [], (a, ai, v, vi) =>
 
 Since input values don't have to be arrays, you can also use any other iterable data type:
 
-```
+```javascript
 function* innerIterable(x) {
     yield x * 3;
     yield x * 5;
@@ -142,7 +142,7 @@ In a 1-N data structure, the top-level sequence is assumed to contain objects wh
 
 Assuming a 1-N structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
 
-```
+```javascript
 const data = [
   { country: "UK",
     cities: [
@@ -164,7 +164,7 @@ Array.from(flattenOneToN(data))
 
 If there are several n-fields in the source objects, the resulting sequence contains permutations:
 
-```
+```javascript
 Array.from(flattenOneToN([
   { country: "UK",
     cities: [
@@ -220,7 +220,7 @@ Array.from(flattenOneToN([
 
 It is possible to override the standard auto-detection mechanism by passing a function. This works for both per-object detection (in the following sample) or one-time detection.
 
-```
+```javascript
 Array.from(flattenOneToN([
   {
     type: "order",
@@ -259,7 +259,7 @@ Array.from(flattenOneToN([
 
 Instead of relying on the automatic detection of n-fields, you can pass in their names explicitly. If there are fields that would automatically be recognized as n-fields but are excluded explicitly, they will become part of the result objects without flattening:
 
-```
+```javascript
 Array.from(flattenOneToN([
   { country: "UK",
     cities: [
