@@ -250,8 +250,9 @@ describe("#flattenOneToN", function() {
 		  ]
 		} 
 	    ],
-	    undefined,
-	    () => ["cities"]
+	    undefined, {
+		dynamicDetector: () => ["cities"]
+	    }
 	))).to.eql([
             { "city": "London", "country": "UK",  "population": 10000000, counties: [
 		{ county: "Kent" },
@@ -263,4 +264,93 @@ describe("#flattenOneToN", function() {
 	    ] }
 	]);
     });
+    it("should work with primitive types in N relation", function() {
+	expect(Array.from(flattenOneToN(
+	    [
+		{
+		    order: "12345",
+		    productIds: [7, 8, 9]
+		}]))).to.eql([
+		    {order: "12345", productIds: 7 },
+		    {order: "12345", productIds: 8 },
+		    {order: "12345", productIds: 9 }
+		]);
+	
+    });
+    it("should work with primitive types in N relation - strings", function() {
+	expect(Array.from(flattenOneToN(
+	    [
+		{
+		    order: "12345",
+		    productIds: ["seven", "eight", "nine"]
+		}]))).to.eql([
+		    {order: "12345", productIds: "seven" },
+		    {order: "12345", productIds: "eight" },
+		    {order: "12345", productIds: "nine" }
+		]);
+	
+    });
+    
+    it("should work with individual object n-fields", function() {
+	let result = Array.from(flattenOneToN(
+	    [
+		{
+		    order: "12345",
+		    productIds: [7, 8, 9]
+		},
+		{
+		    order: "87463",
+		    remoteRefs: ["one", "two", "three"]
+		}
+	    ],
+	    undefined, {
+		perSourceObject: true
+	    }
+	));
+	
+	expect(result).to.eql([
+	    { order: '12345', productIds: 7 },
+	    { order: '12345', productIds: 8 },
+	    { order: '12345', productIds: 9 },
+	    { order: '87463', remoteRefs: 'one' },
+	    { order: '87463', remoteRefs: 'two' },
+	    { order: '87463', remoteRefs: 'three' } ]);
+    });
+    it("should work with individual object n-fields with dynamic detection", function() {
+	let result = Array.from(flattenOneToN(
+	    [
+		{
+		    type: "order",
+		    orderId: "987987",
+		    productIds: [7, 8]
+		},
+		{
+		    type: "delivery",
+		    deliveryId: "432141",
+		    deliveryRefs: ["one", "two"]
+		}
+	    ],
+	    undefined, {
+		perSourceObject: true,
+		dynamicDetector: o => {
+		    if (o.type === "order") {
+			return ["productIds"];			
+		    }
+		    else if (o.type === "delivery") {
+			return ["deliveryRefs"];
+		    }
+		    else {
+			return [];
+		    }
+		}
+	    }
+	));
+	
+	expect(result).to.eql([
+	    { type: "order", orderId: '987987', productIds: 7 },
+	    { type: "order", orderId: '987987', productIds: 8 },
+	    { type: "delivery", deliveryId: '432141', deliveryRefs: "one" },
+	    { type: "delivery", deliveryId: '432141', deliveryRefs: "two" } ]);
+    });
+    
 });

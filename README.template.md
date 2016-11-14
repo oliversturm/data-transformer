@@ -136,7 +136,7 @@ Array.from(iterableOfIterablesToObjects(outerIterable()))
 
 ### flattenOneToN
 
-Assuming a structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
+Assuming a 1-N structure of completely fictitious data, a simple call to **flattenOneToN** returns a flat data structure:
 
 ```
 const data = [
@@ -212,8 +212,7 @@ Array.from(flattenOneToN([
 ]
 ```
 
-**MISSING: delegate for n-field detection**
-
+Finally, if you need to dynamically detect n-fields, you can pass a function to **flattenOneToN** for the **detectNfields** parameter.
 
 # API Reference
 

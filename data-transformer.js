@@ -92,7 +92,10 @@ export function* iterableOfIterablesToObjects(source, fieldNames = [], fieldPref
  * @param {bool | function} detectNfields - If this is a `bool`, the value is `true` and **nFields** is empty, n-fields will be auto-detected. If this is a function (and **nFields** is empty), the function is called with a single parameter, the first object from the **source** sequence, and it is expected to return a list of n-fields.
  * @return {iterable} An iterable sequence of result objects. These objects contain all fields found in the **source** sequence objects with the exception of those declared as n-fields. In addition, the objects contain all fields from the sub-iterable objects of the n-fields. If there is more than one n-field, the sequence contains objects reflecting all permutations of the n-field sub-iterable combinations.
  */
-export function* flattenOneToN(source, nFields = [], detectNfields = true) {
+export function* flattenOneToN(source, nFields = [], nFieldHandling = {
+    perSourceObject: false,
+    dynamicDetector: undefined
+}) {
     function* findNfields(o) {
 	for (let field in o) {
 	    if (typeof o[field] != "string" && typeof o[field][Symbol.iterator] === "function"){
@@ -101,23 +104,29 @@ export function* flattenOneToN(source, nFields = [], detectNfields = true) {
 	}
     }
 
-    let actualNfields = Array.from((() => {
-	if (nFields.length == 0 && detectNfields) {
-	    const { value: firstValue, done } = source[Symbol.iterator]().next();
-	    if (!done) {
-		return (typeof detectNfields === "function") ?
-		    detectNfields(firstValue) : findNfields(firstValue);
+    let _nFields = nFields;
+    
+    if (nFields.length == 0 && !nFieldHandling.perSourceObject) {
+	const { value: firstValue, done } = source[Symbol.iterator]().next();
+	if (!done) {
+	    _nFields = Array.from(nFieldHandling.dynamicDetector ?
+				  nFieldHandling.dynamicDetector(firstValue) : findNfields(firstValue));
+	}	
+    }
+    
+    function copyFields(source, target, exclusions=[], sourceName="") {
+	if (source != null && typeof source === "object") {
+	    for (let f in source) {
+		if (! exclusions.includes(f)) {
+		    target[f] = source[f];
+		}
 	    }
 	}
-
-	return nFields;	    
-    })());
-
-    function copyFields(source, target, exclusions=[]) {
-	for (let f in source) {
-	    if (! exclusions.includes(f)) {
-		target[f] = source[f];
+	else {
+	    if (!sourceName) {
+		throw `copyFields encountered a non-object source (${source}), but no sourceName was provided.`;
 	    }
+	    target[sourceName] = source;
 	}
 	return target;
     }
@@ -127,36 +136,41 @@ export function* flattenOneToN(source, nFields = [], detectNfields = true) {
     }
     
     for (let d of source) {
-	let o = copyFields(d, {}, actualNfields);
+	if (nFields.length == 0 && nFieldHandling.perSourceObject) {
+	     _nFields = Array.from(nFieldHandling.dynamicDetector ?
+				  nFieldHandling.dynamicDetector(d) : findNfields(d));
+	}
+	
+	let o = copyFields(d, {}, _nFields);
 	
 	function* recurse(fieldIndex, o) {
-	    if (actualNfields.length - fieldIndex < 1) {
+	    if (_nFields.length - fieldIndex < 1) {
 		return;
 	    }
 	    
-	    const myList = d[actualNfields[fieldIndex]];
-	    if (myList.length > 0) {
+	    const myList = d[_nFields[fieldIndex]];
+	    if (myList && myList.length > 0) {
 		const originalO = cloneObject(o);
 		
-		for (let value of d[actualNfields[fieldIndex]]) {
+		for (let value of d[_nFields[fieldIndex]]) {
 		    let iterationO = cloneObject(originalO);
-		    copyFields(value, iterationO);
+		    copyFields(value, iterationO, [], _nFields[fieldIndex]);
 		    
 		    yield* recurse(fieldIndex + 1, iterationO);
-		    if (fieldIndex === actualNfields.length - 1){
+		    if (fieldIndex === _nFields.length - 1){
 			yield iterationO;
 		    }
 		}
 	    }
 	    else {
 		yield* recurse(fieldIndex + 1, o);
-		if (fieldIndex === actualNfields.length - 1){
+		if (fieldIndex === _nFields.length - 1){
 		    yield o;
 		}
 	    }
 	}
 
-	if (actualNfields.length > 0){
+	if (_nFields.length > 0){
 	    yield* recurse(0, o);
 	}
 	else {
