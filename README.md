@@ -152,13 +152,67 @@ const data = [
 Array.from(flattenOneToN(data))
 
 [
-  { country: 'UK', city: 'London', population: 10000000 },
-  { country: 'UK', city: 'Edinburgh', population: 800000 },
-  { country: 'USA', city: 'New York', population: 12000000 }
+  { country: "UK", city: "London", population: 10000000 },
+  { country: "UK", city: "Edinburgh", population: 800000 },
+  { country: "USA", city: "New York", population: 12000000 }
 ]
 ```
 
+If there are several n-fields in the source objects, the resulting sequence contains permutations:
 
+```
+Array.from(flattenOneToN([
+  { country: "UK",
+    cities: [
+      { city: "London", population: 10000000 },
+      { city: "Edinburgh", population: 800000 } ],
+    counties: [
+      { county: "Kent" },
+      { county: "Buckinghamshire" },
+      { county: "Warwickshire" },
+      { county: "Yorkshire" } ]
+  } 
+]))
+	
+[
+  { "city": "London", "country": "UK", "county": "Kent", "population": 10000000 },
+  { "city": "London", "country": "UK", "county": "Buckinghamshire", "population": 10000000 },
+  { "city": "London", "country": "UK", "county": "Warwickshire", "population": 10000000 },
+  { "city": "London", "country": "UK", "county": "Yorkshire", "population": 10000000 },
+  { "city": "Edinburgh", "country": "UK", "county": "Kent", "population": 800000 },
+  { "city": "Edinburgh", "country": "UK", "county": "Buckinghamshire", "population": 800000 },
+  { "city": "Edinburgh", "country": "UK", "county": "Warwickshire", "population": 800000 },
+  { "city": "Edinburgh", "country": "UK", "county": "Yorkshire", "population": 800000 }
+]
+```
+
+Instead of relying on the automatic detection of n-fields, you can pass in their names explicitly. If there are fields that would automatically be recognized as n-fields but are excluded explicitly, they will become part of the result objects without flattening:
+
+```
+Array.from(flattenOneToN([
+  { country: "UK",
+    cities: [
+      { city: "London", population: 10000000 },
+      { city: "Edinburgh", population: 800000 } ],
+    counties: [
+      { county: "Kent" },
+      { county: "Buckinghamshire" } ]
+  } ],
+["cities"]))
+
+[
+  { "city": "London", "country": "UK",  "population": 10000000, counties: [
+    { county: "Kent" },
+    { county: "Buckinghamshire" }
+  ] },
+  { "city": "Edinburgh", "country": "UK", "population": 800000, counties: [
+    { county: "Kent" },
+    { county: "Buckinghamshire" }
+  ] }
+]
+```
+
+**MISSING: delegate for n-field detection**
 
 
 # API Reference
