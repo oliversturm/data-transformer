@@ -86,35 +86,86 @@ describe("#fold", function () {
 			});
 });
 
-describe("#transformArrayOfArrays", function () {
+describe("#iterableOfIterablesToObjects", function () {
+			var _marked = [innerIterable, outerIterable].map(regeneratorRuntime.mark);
+
 			var source = [[1, 2], ["one", "two"]];
 
 			it("should return correct value for simple transformation", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, ["one", "two"]))).to.eql([{ one: 1, two: 2 }, { one: "one", two: "two" }]);
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, ["one", "two"]))).to.eql([{ one: 1, two: 2 }, { one: "one", two: "two" }]);
 			});
 			it("should use default field names if not enough names are given", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, ["one"]))).to.eql([{ one: 1, field1: 2 }, { one: "one", field1: "two" }]);
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, ["one"]))).to.eql([{ one: 1, field1: 2 }, { one: "one", field1: "two" }]);
 			});
 			it("should use only default field names if no names are given", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source))).to.eql([{ field0: 1, field1: 2 }, { field0: "one", field1: "two" }]);
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source))).to.eql([{ field0: 1, field1: 2 }, { field0: "one", field1: "two" }]);
 			});
 			it("should use custom field prefix if given", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, undefined, "xxx"))).to.eql([{ xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" }]);
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, undefined, "xxx"))).to.eql([{ xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" }]);
 			});
 			it("should accept string as field prefix function return", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, undefined, function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, undefined, function () {
 									return "xxx";
 						}))).to.eql([{ xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" }]);
 			});
 			it("should accept object as field prefix function return", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, undefined, function () {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, undefined, function () {
 									return { prefix: "xxx" };
 						}))).to.eql([{ xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" }]);
 			});
 			it("should skip field numbering if told", function () {
-						(0, _chai.expect)(Array.from((0, _dataTransformer.transformArrayOfArrays)(source, undefined, function (a, ai, v, vi) {
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(source, undefined, function (a, ai, v, vi) {
 									return { prefix: "xxx" + vi * 2, skipNumbering: true };
 						}))).to.eql([{ xxx0: 1, xxx2: 2 }, { xxx0: "one", xxx2: "two" }]);
+			});
+
+			function innerIterable(x) {
+						return regeneratorRuntime.wrap(function innerIterable$(_context3) {
+									while (1) {
+												switch (_context3.prev = _context3.next) {
+															case 0:
+																		_context3.next = 2;
+																		return x * 3;
+
+															case 2:
+																		_context3.next = 4;
+																		return x * 5;
+
+															case 4:
+															case "end":
+																		return _context3.stop();
+												}
+									}
+						}, _marked[0], this);
+			}
+
+			function outerIterable() {
+						return regeneratorRuntime.wrap(function outerIterable$(_context4) {
+									while (1) {
+												switch (_context4.prev = _context4.next) {
+															case 0:
+																		_context4.next = 2;
+																		return innerIterable(3);
+
+															case 2:
+																		_context4.next = 4;
+																		return innerIterable(5);
+
+															case 4:
+															case "end":
+																		return _context4.stop();
+												}
+									}
+						}, _marked[1], this);
+			}
+
+			it("should work with iterables that are not arrays", function () {
+
+						(0, _chai.expect)(Array.from((0, _dataTransformer.iterableOfIterablesToObjects)(outerIterable()))).to.eql([{
+									field0: 9, field1: 15
+						}, {
+									field0: 15, field1: 25
+						}]);
 			});
 });
 

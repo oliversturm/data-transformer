@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import {
-    transformArrayOfArrays,
+    iterableOfIterablesToObjects,
     map,
     fold,
     flattenOneToN
@@ -51,37 +51,59 @@ describe("#fold", function() {
 
 
 
-describe("#transformArrayOfArrays", function() {
+describe("#iterableOfIterablesToObjects", function() {
     const source = [[1, 2], ["one", "two"]];
     
     it("should return correct value for simple transformation", function() {
-	expect(Array.from(transformArrayOfArrays(source, ["one", "two"]))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, ["one", "two"]))).to.
 	    eql([ { one: 1, two: 2 }, { one: "one", two: "two" } ]);
     });
     it("should use default field names if not enough names are given", function() {
-	expect(Array.from(transformArrayOfArrays(source, ["one"]))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, ["one"]))).to.
 	    eql([ { one: 1, field1: 2 }, { one: "one", field1: "two" } ]);
     });
     it("should use only default field names if no names are given", function() {
-	expect(Array.from(transformArrayOfArrays(source))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source))).to.
 	    eql([ { field0: 1, field1: 2 }, { field0: "one", field1: "two" } ]);
     });
     it("should use custom field prefix if given", function() {
-	expect(Array.from(transformArrayOfArrays(source, undefined, "xxx"))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, undefined, "xxx"))).to.
 	    eql([ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]);
     });
     it("should accept string as field prefix function return", function() {
-	expect(Array.from(transformArrayOfArrays(source, undefined, () => "xxx"))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, undefined, () => "xxx"))).to.
 	    eql([ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]);
     });
     it("should accept object as field prefix function return", function() {
-	expect(Array.from(transformArrayOfArrays(source, undefined, () => ({ prefix: "xxx" })))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, undefined, () => ({ prefix: "xxx" })))).to.
 	    eql([ { xxx0: 1, xxx1: 2 }, { xxx0: "one", xxx1: "two" } ]);
     });
     it("should skip field numbering if told", function() {
-	expect(Array.from(transformArrayOfArrays(source, undefined, (a, ai, v, vi) => ({ prefix: "xxx" + vi * 2, skipNumbering: true })))).to.
+	expect(Array.from(iterableOfIterablesToObjects(source, undefined, (a, ai, v, vi) => ({ prefix: "xxx" + vi * 2, skipNumbering: true })))).to.
 	    eql([ { xxx0: 1, xxx2: 2 }, { xxx0: "one", xxx2: "two" } ]);
     });
+
+    function* innerIterable(x) {
+	yield x * 3;
+	yield x * 5;
+    }
+
+    function* outerIterable() {
+	yield innerIterable(3);
+	yield innerIterable(5);
+    }
+    
+    it("should work with iterables that are not arrays", function() {
+
+	expect(Array.from(iterableOfIterablesToObjects(outerIterable()))).to.
+	    eql([ {
+		field0: 9, field1: 15
+	    }, {
+		field0: 15, field1: 25
+	    }]);
+	
+    });
+    
 
 });
 
