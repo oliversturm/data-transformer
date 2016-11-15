@@ -6,7 +6,7 @@ DIST = dist/data-transformer.js dist/data-transformer.min.js
 TESTSRC = $(wildcard tests/*.js)
 TESTLIB = $(TESTSRC:tests/%.js=tests/lib/%.js)
 
-.PHONY: all test publish
+.PHONY: all test publish bowerreg
 
 all: $(DIST) docs
 
@@ -37,3 +37,6 @@ print-%: ; @echo $* = $($*)
 
 publish: all
 	npm publish
+
+bowerreg: all
+	bower register data-transformer git://github.com/oliversturm/data-transformer.git
