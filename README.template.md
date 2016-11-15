@@ -57,7 +57,7 @@ You can include both scripts directly from the bower_components directory:
 <html>
   <head>
     <script src="bower_components/babel-polyfill/browser-polyfill.js"></script>
-    <script src="bower_components/data-transformer/dist/data-transformer.min.js"></script>
+    <script src="bower_components/data-transformer/dist/data-transformer-browser.js"></script>
   </head>
   <body>
     <div id="output"></div>

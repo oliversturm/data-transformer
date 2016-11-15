@@ -2,7 +2,7 @@ export SHELL=/bin/bash
 export PATH := ./node_modules/.bin:$(PATH)
 
 SRC = data-transformer.js
-DIST = dist/data-transformer.js dist/data-transformer.min.js
+DIST = dist/data-transformer.js dist/data-transformer-browser.js
 TESTSRC = $(wildcard tests/*.js)
 TESTLIB = $(TESTSRC:tests/%.js=tests/lib/%.js)
 
@@ -29,7 +29,7 @@ dist/data-transformer.js: $(SRC) .babelrc
 	mkdir -p $(@D)
 	babel -s true $< -o $@
 
-dist/data-transformer.min.js: $(SRC) webpack.config.js
+dist/data-transformer-browser.js: $(SRC) webpack.config.js
 	mkdir -p $(@D)
 	webpack
 

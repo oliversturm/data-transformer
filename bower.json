@@ -1,7 +1,7 @@
 {
   "name": "data-transformer",
   "description": "Transformation helpers for JavaScript iterables",
-  "main": "dist/data-transformer.min.js",
+  "main": "dist/data-transformer-browser.js",
   "authors": [
     "Oliver Sturm <oliver@oliversturm.com>"
   ],
