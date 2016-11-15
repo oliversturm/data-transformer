@@ -10,6 +10,12 @@
 npm install data-transformer
 ```
 
+### bower
+
+```
+bower install data-transformer
+```
+
 ## Usage
 
 **data-transformer.js** relies on iterable support. It is built using Babel's regeneratorRuntime, so babel-polyfill is a requirement to use **data-transformer.js**.
@@ -37,6 +43,33 @@ var dataTransformer = require("data-transformer");
 console.log(Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2, 3])));
 ```
 
+### In the browser
+
+Assuming you have installed both **babel-polyfill** and **data-transformer** using bower:
+
+```
+bower install babel-polyfill data-transformer
+```
+
+You can include both scripts directly from the bower_components directory:
+
+```html
+<html>
+  <head>
+    <script src="bower_components/babel-polyfill/browser-polyfill.js"></script>
+    <script src="bower_components/data-transformer/dist/data-transformer.min.js"></script>
+  </head>
+  <body>
+    <div id="output"></div>
+    <script>
+      (function() {
+      var result = Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2, 3]));
+      document.getElementById("output").textContent = result;
+      })();
+    </script>
+  </body>
+</html>
+```
 
 ## Examples
 
