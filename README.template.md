@@ -218,7 +218,7 @@ Array.from(flattenOneToN([
 ]
 ```
 
-It is possible to override the standard auto-detection mechanism by passing a function. This works for both per-object detection (in the following sample) or one-time detection.
+It is possible to override the standard auto-detection mechanism for n-fields by passing a function. This works for both per-object detection (in the following sample) or one-time detection.
 
 ```javascript
 Array.from(flattenOneToN([

@@ -1,10 +1,10 @@
 var webpack = require("webpack");
 
 module.exports = {
-    entry: ["babel-polyfill", "./data-transformer.js"],
-    devtool: "source-map",
+    entry: "./data-transformer.js",
     output: {
-	filename: "./dist/data-transformer.js",
+	filename: "./dist/data-transformer.min.js",
+	library: "dataTransformer",
 	libraryTarget: "umd"
     },
     module: {
@@ -28,3 +28,4 @@ module.exports = {
 	})
     ]
 };
+

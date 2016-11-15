@@ -2,13 +2,13 @@ export SHELL=/bin/bash
 export PATH := ./node_modules/.bin:$(PATH)
 
 SRC = data-transformer.js
-DIST = dist/data-transformer.js
+DIST = dist/data-transformer.js dist/data-transformer.min.js
 TESTSRC = $(wildcard tests/*.js)
 TESTLIB = $(TESTSRC:tests/%.js=tests/lib/%.js)
 
 .PHONY: all test
 
-all: $(DIST)
+all: $(DIST) docs
 
 docs: README.md
 
@@ -25,9 +25,12 @@ tests/lib/%.js: tests/%.js .babelrc
 	mkdir -p $(@D)
 	babel $< -o $@
 
-dist/data-transformer.js: data-transformer.js .babelrc webpack.config.js
+dist/data-transformer.js: $(SRC) .babelrc
 	mkdir -p $(@D)
-	babel $< -o $@
+	babel -s true $< -o $@
+
+dist/data-transformer.min.js: $(SRC) webpack.config.js
+	mkdir -p $(@D)
 	webpack
 
 print-%: ; @echo $* = $($*)
