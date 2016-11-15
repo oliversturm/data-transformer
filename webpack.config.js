@@ -8,6 +8,7 @@ module.exports = [
 	    library: "dataTransformer",
 	    libraryTarget: "umd"
 	},
+	devtool: "source-map",
 	module: {
 	    loaders: [
 		{
@@ -36,6 +37,7 @@ module.exports = [
 	    library: "dataTransformer",
 	    libraryTarget: "umd"
 	},
+	devtool: "source-map",
 	module: {
 	    loaders: [
 		{
