@@ -1,0 +1,20 @@
+{
+  "name": "data-transformer",
+  "description": "Transformation helpers for JavaScript iterables",
+  "main": "dist/data-transformer.min.js",
+  "authors": [
+    "Oliver Sturm <oliver@oliversturm.com>"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "util"
+  ],
+  "homepage": "https://github.com/oliversturm/data-transformer",
+  "ignore": [
+      "**/.*",
+      "**/*~",
+      "node_modules",
+      "bower_components",
+      "tests"
+  ]
+}
