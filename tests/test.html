@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <script src="../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
+    <script src="../dist/data-transformer.min.js"></script>
+  </head>
+  <body>
+    <div id="output"></div>
+    <script>
+      (function() {
+      var result = Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2, 3]));
+      document.getElementById("output").textContent = result;
+      })();
+    </script>
+  </body>
+</html>
