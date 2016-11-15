@@ -1,6 +1,6 @@
 {
   "name": "data-transformer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Transformation helpers for JavaScript iterables",
   "main": "dist/data-transformer.js",
   "scripts": {
