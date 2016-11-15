@@ -45,13 +45,7 @@ console.log(Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2,
 
 ### In the browser
 
-Assuming you have installed both **babel-polyfill** and **data-transformer** using bower:
-
-```
-bower install babel-polyfill data-transformer
-```
-
-You can include both scripts directly from the bower_components directory:
+You can include both babel-polyfill and data-transformer directly from the bower_components directory:
 
 ```html
 <html>
