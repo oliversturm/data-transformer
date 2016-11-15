@@ -4,7 +4,39 @@
 
 ## Installation
 
+### npm
+
+```
+npm install data-transformer
+```
+
 ## Usage
+
+**data-transformer.js** relies on iterable support. It is built using Babel's regeneratorRuntime, so babel-polyfill is a requirement to use **data-transformer.js**.
+
+### Using ES6
+
+```javascript
+import "babel-polyfill";
+import {
+    iterableOfIterablesToObjects,
+    map,
+    fold,
+    flattenOneToN
+} from "data-transformer";
+
+console.log(Array.from(map(x => x * x, [1, 2, 3])));
+```
+
+### Without ES6
+
+```javascript
+require("babel-polyfill");
+var dataTransformer = require("data-transformer");
+
+console.log(Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2, 3])));
+```
+
 
 ## Examples
 
