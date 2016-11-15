@@ -36,6 +36,14 @@ dist/data-transformer-browser.js: $(SRC) webpack.config.js
 print-%: ; @echo $* = $($*)
 
 publish: all
+	@echo "Make sure git changes have been committed."
+	@echo "Current version from package.json:"
+	grep --color "version" package.json
+	@while [ -z "$$NEWVERSION" ]; do \
+		read -p "Enter the new version: " NEWVERSION; \
+	done ; \
+	npm version $$NEWVERSION; \
+	git push && git push --tags; \
 	npm publish
 
 bowerreg: all
