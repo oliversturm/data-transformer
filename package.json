@@ -1,8 +1,8 @@
 {
-  "name": "data-transformer.js",
+  "name": "data-transformer",
   "version": "0.1.0",
   "description": "Transformation helpers for JavaScript iterables",
-  "main": "data-transformer.js",
+  "main": "dist/data-transformer.js",
   "scripts": {
     "test": "make test",
     "build": "make"

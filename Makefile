@@ -6,7 +6,7 @@ DIST = dist/data-transformer.js dist/data-transformer.min.js
 TESTSRC = $(wildcard tests/*.js)
 TESTLIB = $(TESTSRC:tests/%.js=tests/lib/%.js)
 
-.PHONY: all test
+.PHONY: all test publish
 
 all: $(DIST) docs
 
@@ -35,3 +35,5 @@ dist/data-transformer.min.js: $(SRC) webpack.config.js
 
 print-%: ; @echo $* = $($*)
 
+publish: all
+	npm publish
