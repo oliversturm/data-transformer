@@ -16,6 +16,14 @@ npm install data-transformer
 bower install data-transformer
 ```
 
+### CDN
+
+jsdelivr inclusion is pending, as an interim solution you can use the following URL:
+
+```
+https://d1yfqaepocu4bl.cloudfront.net/<VERSION>/data-transformer-browser.min.js
+```
+
 ## Usage
 
 **data-transformer.js** relies on iterable support. It is built using Babel's regeneratorRuntime, so babel-polyfill is a requirement to use **data-transformer.js**.

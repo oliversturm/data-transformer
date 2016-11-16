@@ -44,7 +44,8 @@ publish: all
 	done ; \
 	npm version $$NEWVERSION; \
 	git push && git push --tags; \
-	npm publish
+	npm publish; \
+	s3-cli --region "eu-west-1" put -P dist/data-transformer-browser.min.js s3://data-transformer/$$NEWVERSION/data-transformer-browser.min.js
 
 bowerreg: all
 	bower register data-transformer git://github.com/oliversturm/data-transformer.git
