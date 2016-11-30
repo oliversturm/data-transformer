@@ -77,7 +77,7 @@ You can include both babel-polyfill and data-transformer directly from the bower
 <html>
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.16.0/polyfill.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/data-transformer/0.1.11/data-transformer-browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/data-transformer/0.1.12/data-transformer-browser.min.js"></script>
   </head>
   <body>
     <div id="output"></div>
