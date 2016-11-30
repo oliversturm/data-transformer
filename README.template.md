@@ -18,10 +18,10 @@ bower install data-transformer
 
 ### CDN
 
-jsdelivr inclusion is pending, as an interim solution you can use the following URL:
+**data-transformer.js** is available from jsdelivr.com. You can copy the latest version URL from [the project page](http://www.jsdelivr.com/projects/data-transformer). It looks like this:
 
 ```
-https://d1yfqaepocu4bl.cloudfront.net/<VERSION>/data-transformer-browser.min.js
+https://cdn.jsdelivr.net/data-transformer/<VERSION>/data-transformer-browser.min.js
 ```
 
 ## Usage
@@ -53,13 +53,31 @@ console.log(Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2,
 
 ### In the browser
 
-You can include both babel-polyfill and data-transformer directly from the bower_components directory:
+You can include both babel-polyfill and data-transformer directly from the bower_components directory, or alternatively use CDN paths:
 
 ```html
 <html>
   <head>
     <script src="bower_components/babel-polyfill/browser-polyfill.js"></script>
     <script src="bower_components/data-transformer/dist/data-transformer-browser.js"></script>
+  </head>
+  <body>
+    <div id="output"></div>
+    <script>
+      (function() {
+      var result = Array.from(dataTransformer.map(function(x) { return x * x; }, [1, 2, 3]));
+      document.getElementById("output").textContent = result;
+      })();
+    </script>
+  </body>
+</html>
+```
+
+```html
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.16.0/polyfill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/data-transformer/0.1.12/data-transformer-browser.min.js"></script>
   </head>
   <body>
     <div id="output"></div>

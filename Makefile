@@ -36,15 +36,15 @@ dist/data-transformer-browser.js: $(SRC) webpack.config.js
 print-%: ; @echo $* = $($*)
 
 publish: all
-	@echo "Make sure git changes have been committed."
+	@echo "MAKE SURE CHANGES HAVE BEEN PUSHED TO GITHUB."
 	@echo "Current version from package.json:"
 	grep --color "version" package.json
 	@while [ -z "$$NEWVERSION" ]; do \
 		read -p "Enter the new version: " NEWVERSION; \
 	done ; \
 	npm version $$NEWVERSION; \
-	git push && git push --tags; \
-	npm publish; \
+	git push --tags && \
+	npm publish && \
 	s3-cli --region "eu-west-1" put -P dist/data-transformer-browser.min.js s3://data-transformer/$$NEWVERSION/data-transformer-browser.min.js
 
 bowerreg: all
